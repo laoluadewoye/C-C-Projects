@@ -26,5 +26,12 @@ If we land on something, we need a way for the AI to check if it should keep sea
 
 <p><br />&nbsp; U&nbsp; &nbsp;D&nbsp; &nbsp; L&nbsp; &nbsp; R<br />----------------<br />|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;| Row 6<br />----------------<br />|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp;Row 5<br />----------------<br />|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp;Row 4<br />----------------<br />|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp;Row 3<br />----------------<br />|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp;Row 2<br />----------------<br />|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp;Row 1<br />----------------<br />|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp; &nbsp; &nbsp;|&nbsp;Row 0<br />----------------</p>
 
+Much like a stack in assembly, this stack uses a Last In First Out (LIFO) methodology, as the last row put in is the one to get removed first. Only rather than store pure data, this stack stores a row of numbers. Each row corresponds to-
 
+1) The number above the last coordinate attempt
+2) The number below the last coordinate attempt
+3) The number to the left of the last coordinate attempt
+4) The number to the right of the last coordinate attempt
+
+-In that order.
 
