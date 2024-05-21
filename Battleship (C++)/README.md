@@ -18,4 +18,4 @@ How this program works is that the main program will create a battleship object 
 
 The AI was, for two years, the bane of my existence. It would be so simply if I was in Python and I can create all the data structures I want with ease, but C forced me to come up with something creative. A huge goal for this project was to use only basic arrays and data structures, and having a 2D structure felt weird, so instead, I created a stack!
 
-The 
+The way the AI works is that there are two static arrays in memory. The first is an array of 100 coordinates (as integers) that records each untried spot on the board. The second is an array of 28 empty spots, to which I call the smark stack. The first array is easy - we pull a random guess from the guesses we still have, "delete it" from the array (delete in quotes since its C), and see if it works. But what if we land on something?
