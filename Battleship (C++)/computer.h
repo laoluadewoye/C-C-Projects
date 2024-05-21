@@ -3,38 +3,40 @@
 
 #include "player.h"
 
-
-class Computer : public Player //This should be able to select its own coors and chase after hits
-{
+class Computer : public Player { //This should be able to select its own coors and chase after hits
 private:
-    //Main list of coordinates
-    int* unusedCoor = new int[100];
-    int unusedLength;
+    //Basic predictions
+    array<int, 100> unusedCoor; //1 is unused, 0 is used
+    int unusedLeft;
 
-    //List of coordinates to target specifically
-    int* aroundHit = new int[8]; //Array used by object to hit more. This array is reloaded with the below arary
-    int AHLength;
-    bool aroundHitEmpty;
+    //Smart stack to search for patterns
+    array<int, 28> smartStack; //4 x 8, 4 for each direction, very bottom is reserved
+    int smartStackCounter;
 
-    //List that generates new targets but doesn't immediately use
-    int* newAround = new int[8]; //New array that gets made after every hit
-    int NALength;
-
-    bool attackSuccess; //variable is going to be changed and unchanged after a successful attack
-
+    //Last number and direction(-1 means no successful attack)
+    bool lastSuccess;
+    int lastCoor;
+    int lastDir;
 public:
     //Constructor functions
     Computer();
     Computer(int);
-    void computerSetup();
 
-    //AI functionality
-    int chooseCoordinate();
-    int useAround(int);
-    bool checkUnused(int);
-    void updateUnused(int);
-    void updateAround(int);
-    void generateAround(int);
+    //Array functions
+    void deleteUsed(int);
+
+    //Stack functions
+    void pushStack(int);
+    void popStack();
+    void popDirection(int);
+
+    //Setting functions
+    void setSuccess(bool);
+
+    // Attack functions
+    int sendAttackAuto();
+    int chooseSmart();
+    int checkStack(int);
 };
 
 #endif // COMPUTER_H

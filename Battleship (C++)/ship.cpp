@@ -2,25 +2,21 @@
 
 using namespace std;
 
+//Default Constructor
 Ship::Ship() {
     shipLength = 0;
     shipType = 0;
     directionFacing = ' ';
-    shipCoordinates = nullptr;
-    shipCoorStatus = nullptr;
     isSunk = true;
-    alreadyDead = true;
-    backArrow = 'N';
 
     printTest();
 }
 
+// Type-specific constructor
 Ship::Ship(int type) {
     //General initialization
     directionFacing = 'R';
     isSunk = false;
-    alreadyDead = false;
-    backArrow = '<';
 
     //Type specific initialization
     byTypeinit(type);
@@ -28,6 +24,7 @@ Ship::Ship(int type) {
     printTest();
 }
 
+//Set up the length and arrays
 void Ship::byTypeinit(int type) {
     shipType = type;
 
@@ -52,18 +49,19 @@ void Ship::byTypeinit(int type) {
             break;
     }
 
-    shipCoordinates = new int[shipLength];
-    shipCoorStatus = new int[shipLength];
-    defaultFill(shipCoordinates, shipCoorStatus);
+    defaultFill();
 }
 
-void Ship::defaultFill(int* shipCoordinates, int* shipCoorStatus) {
-    for (int i = 0; i < shipLength; i++) {
+// Default filling coordinates
+void Ship::defaultFill() {
+    int FULLLENGTH = 5;
+    for (int i = 0; i < FULLLENGTH; i++) {
         shipCoordinates[i] = -1;
         shipCoorStatus[i] = -1;
     }
 }
 
+// Check to make sure ship is properly initalized.
 void Ship::printTest() {
     if (shipType == 0) {
         cout << "Something went wrong with creating the object. Look in boat." << endl;
@@ -73,42 +71,50 @@ void Ship::printTest() {
     }
 }
 
+// Getter function for ship length
 int Ship::getShipLength() {
     return shipLength;
 }
 
+// Setter function for ship length
 int Ship::getShipType() {
     return shipType;
 }
 
-bool Ship::getAlreadyDead() {
-    return alreadyDead;
-}
-
-void Ship::setAlreadyDead(bool newAD) {
-    alreadyDead = newAD;
-}
-
+//Getter function for ship sink status
 bool Ship::getIsSunk() {
     return isSunk;
 }
 
+//Setter function for ship sink status
 void Ship::setIsSunk(bool newSunk) {
     isSunk = newSunk;
 }
 
-int* Ship::getShipCoordinates() {
+//Getter function for ship coordinates
+array<int, 5> Ship::getShipCoordinates() {
     return shipCoordinates;
 }
 
-void Ship::setShipCoordinates(int* testCoor) {
-    shipCoordinates = testCoor;
+//Setter function for ship coordinates int(&newGrid)[100]
+void Ship::setShipCoordinates(array<int, 5> testCoor) {
+    for (int i = 0; i < shipLength; i++){
+        shipCoordinates[i] = testCoor[i];
+    }
 }
 
-int* Ship::getShipCoorStatus() {
+//Getter function for ship status
+array<int, 5> Ship::getShipCoorStatus() {
     return shipCoorStatus;
 }
 
-void Ship::setShipCoorStatus(int* tempCS) {
-    shipCoorStatus = tempCS;
+//Setter function for ship status
+void Ship::setShipCoorStatus(array<int, 5> tempCS) {
+    for (int i = 0; i < shipLength; i++){
+        shipCoorStatus[i] = tempCS[i];
+    }
+}
+
+void Ship::setShipCoorStatusIndex(int index, int status) {
+    shipCoorStatus[index] = status;
 }

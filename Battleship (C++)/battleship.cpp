@@ -1,22 +1,22 @@
 # include "battleship.h"
 
+// Constructor Class for  the Battleship game
 Battleship::Battleship() {
     turnNum = 0;
-    tempOppHold = new int[1];
-    tempOppHold[0] = 0;
-    lastTurnSucc = false;
-    lastCoordinate = 0;
 }
 
+// Starting off the battleship game
 void Battleship::startBattleship() {
     int choice = 0;
 
+    // Beginning script
     cout << "Start!" << endl;
     cout << "Are you playing against another play or CPU? Enter answer below." << endl;
     cout << "Type 1 for two player game." << endl;
     cout << "Type 2 for player vs CPU." << endl;
     cout << "Type 3 for to watch two CPUs go at it." << endl;
 
+    // Decision tree
     for (int i = 0; i < 3; i++) {
         cout << "Enter here (this prompt will show again if you choose wrong): ";
         cin >> choice;
@@ -36,15 +36,17 @@ void Battleship::startBattleship() {
         CVCSetup();
     }
     else {
-        cout << "Wrong selections. Try again." << endl;
+        cout << "Wrong selections. Defaulting to Computer vs Computer." << endl;
+        CVCSetup();
     }
 }
 
+// Player vs Player setup
 void Battleship::PVPSetup() {
     //Creating players
     Player playerOne(1);
     Player playerTwo(2);
-
+    
     playerOne.showOnlyPlayer();
     cout << endl << "Player 1 will now choose the locations of the ships!" << endl;
     manualOrAuto(playerOne);
@@ -53,14 +55,12 @@ void Battleship::PVPSetup() {
     cout << endl << "Player 2 will now choose the locations of the ships!" << endl;
     manualOrAuto(playerTwo);
 
-    //Exchange grids - work on this later
-    playerTwo.acceptEnemyGrid(playerOne.sendOwnGrid()); //P1 sends their grid to P2
-    playerOne.acceptEnemyGrid(playerTwo.sendOwnGrid()); //P2 sends their grid to P1
-
     gameplay(playerOne, playerTwo);
 }
 
+// Player vs Computer setup
 void Battleship::PVCSetup() {
+    //Creating players
     Player playerOne(1);
     Computer computerTwo(2);
 
@@ -72,14 +72,12 @@ void Battleship::PVCSetup() {
     cout << endl << "Computer 2 will now choose the locations of the ships!" << endl;
     computerTwo.placeShipsAuto();
 
-    //Exchange grids - work on this later
-    computerTwo.acceptEnemyGrid(playerOne.sendOwnGrid()); //P1 sends their grid to P2
-    playerOne.acceptEnemyGrid(computerTwo.sendOwnGrid()); //P2 sends their grid to P1
-
     gameplay(playerOne, computerTwo);
 }
 
+// Computer vs Computer setup
 void Battleship::CVCSetup() {
+    //Creating players
     Computer computerOne(1);
     Computer computerTwo(2);
 
@@ -91,14 +89,11 @@ void Battleship::CVCSetup() {
     cout << endl << "Computer 2 will now choose the locations of the ships!" << endl;
     computerTwo.placeShipsAuto();
 
-    //Exchange grids - work on this later
-    computerTwo.acceptEnemyGrid(computerOne.sendOwnGrid()); //P1 sends their grid to P2
-    computerOne.acceptEnemyGrid(computerTwo.sendOwnGrid()); //P2 sends their grid to P1
-
     gameplay(computerOne, computerTwo);
 }
 
-void Battleship::manualOrAuto(Player player) {
+// Deciding whether the player will manually place ships or let the autoplacement do it
+void Battleship::manualOrAuto(Player& player) {
     int choice = 0;
     cout << endl << "Type 1 to generate a board for you." << endl;
     cout << "Type 2 to make the board yourself." << endl;
@@ -122,159 +117,225 @@ void Battleship::manualOrAuto(Player player) {
     }
 }
 
-void Battleship::gameplay(Player playerOne, Player playerTwo) {
-    Player playerCycle[2] = {playerOne, playerTwo};
+// Player vs Player Turn Management
+void Battleship::gameplay(Player& playerOne, Player& playerTwo) {
+    bool gameEnded = false;
+    int loser = 0;
 
-    bool playerDone = false;
-    while (playerDone == false) {
-        turnNum++;
-        for (int i = 0; i < 2; i++) {
-            playerDone = playerAction(playerCycle[i]);
-            if (playerDone) {
-                break;
+    // Show boards at start
+    cout << endl << endl << "Game Start!" << endl;
+    playerOne.showOnlyPlayer();
+    playerTwo.showOnlyPlayer();
+
+    // Loop for entire game
+    while (gameEnded == false) {
+        cout << endl << "Turn " << turnNum + 1 << endl;
+        //Player 1 attacks, Player 2 checks
+        if (playerOne.checkShipHealth() == true) {
+            int att = playerOne.sendAttack();
+            bool result = playerTwo.checkAttack(att);
+            if (result == true) {
+                cout << "Player 1 has successfully hit square " << result << "!" << endl;
             }
-        }
-    }
-
-    endGame(playerOne, playerTwo);
-}
-
-void Battleship::gameplay(Player playerOne, Computer computerTwo) {
-    bool playerNotDone = true;
-    bool computerNotDone = true;
-    while (playerNotDone && computerNotDone) {
-        turnNum++;
-        playerNotDone = !(playerAction(playerOne));
-        computerNotDone = !(computerAction(computerTwo));
-    }
-
-    endGame(playerOne, computerTwo);
-}
-
-void Battleship::gameplay(Computer computerOne, Computer computerTwo) {
-    Computer computerCycle[2] = {computerOne, computerTwo};
-    bool computerDone = false;
-    while (computerDone == false) {
-        turnNum++;
-        for (int i = 0; i < 2; i++) {
-            computerDone = computerAction(computerCycle[i]);
-            if (computerDone) {
-                break;
+            else if (att == -2) { //Ran out of guesses
+                cout << "Player 1 is out of guesses." << endl;
+                cout << "Player 1 has lost the game." << endl;
+                gameEnded = true;
+                loser = 2;
             }
+            else {
+                cout <<  "Player 1 has missed." << endl;
+            }
+            playerOne.modifyEnemyGrid(playerTwo.passOwnGrid());
         }
+        else {
+            cout << "Player 1 has lost the game." << endl;
+            loser = 1;
+            break;
+        }
+        playerOne.showOnlyPlayer();
+
+        //Player 2 attacks, Player 1 checks
+        if (playerTwo.checkShipHealth() == true) {
+            int att = playerTwo.sendAttack();
+            bool result = playerOne.checkAttack(att);
+            if (result == true) {
+                cout << "Player 2 has successfully hit square " << result << "!" << endl;
+            }
+            else if (att == -2) { //Ran out of guesses
+                cout << "Player 2 is out of guesses." << endl;
+                cout << "Player 2 has lost the game." << endl;
+                gameEnded = true;
+                loser = 2;
+            }
+            else {
+                cout << "Player 2 has missed." << endl;
+            }
+            playerTwo.modifyEnemyGrid(playerOne.passOwnGrid());
+        }
+        else {
+            cout << "Player 2 has lost the game." << endl;
+            loser = 2;
+            break;
+        }
+        playerTwo.showOnlyPlayer();
+        
+        turnNum++;
+        sleep(1);
     }
 
-    endGame(computerOne, computerTwo);
+    endgame(loser, turnNum);
 }
 
-bool Battleship::playerAction(Player player) {
-    bool playerDone = false;
-    bool attackSuccess = false;
-    bool horiCheck, vertCheck;
-    int hori, vert, coor;
+// Player vs Computer Turn Management
+void Battleship::gameplay(Player& playerOne, Computer& computerTwo) {
+    bool gameEnded = false;
+    int loser = 0;
 
-    //Pre-turn tasks
-    player.setLastIndex(lastCoordinate);
-    player.setOppSucc(lastTurnSucc);
-    player.setNewSink(tempOppHold); //Get opp hold from last person
-    playerDone = player.preTurnTasks();
+    // Show boards at start
+    cout << endl << endl << "Game Start!" << endl;
+    playerOne.showOnlyPlayer();
+    computerTwo.showOnlyPlayer();
+    
+    // Loop for entire game
+    while (gameEnded == false) {
+        cout << endl << "Turn " << turnNum + 1 << endl;
+        //Player 1 attacks, Player 2 checks
+        if (playerOne.checkShipHealth() == true) {
+            int att = playerOne.sendAttack();
+            bool result = computerTwo.checkAttack(att);
+            if (result == true) {
+                cout << "Player 1 has successfully hit square " << result << "!" << endl;
+            }
+            else if (att == -2) { //Ran out of guesses
+                cout << "Player 1 is out of guesses." << endl;
+                cout << "Player 1 has lost the game." << endl;
+                gameEnded = true;
+                loser = 2;
+            }
+            else {
+                cout <<  "Player 1 has missed." << endl;
+            }
+            playerOne.modifyEnemyGrid(computerTwo.passOwnGrid());
+        }
+        else {
+            cout << "Player 1 has lost the game." << endl;
+            loser = 1;
+            break;
+        }
+        playerOne.showOnlyPlayer();
 
-    //Selection
-    cout << "Turn number: " << turnNum << endl;
-    player.displayTurn();
-
-    if (playerDone) {
-        return playerDone;
+        //Computer 2 attacks, Player 1 checks
+        if (computerTwo.checkShipHealth() == true) {
+            int att = computerTwo.sendAttackAuto();
+            bool result = playerOne.checkAttack(att);
+            computerTwo.setSuccess(result);
+            if (result == true) {
+                cout << "Computer 2 has successfully hit square " << result << "!" << endl;
+            }
+            else if (att == -2) { //Ran out of guesses
+                cout << "Computer 2 is out of guesses." << endl;
+                cout << "Computer 2 has lost the game." << endl;
+                gameEnded = true;
+                loser = 2;
+            }
+            else {
+                cout << "Computer 2 has missed." << endl;
+            }
+            computerTwo.modifyEnemyGrid(playerOne.passOwnGrid());
+        }
+        else {
+            cout << "Computer 2 has lost the game." << endl;
+            loser = 2;
+            break;
+        }
+        computerTwo.showOnlyPlayer();
+        
+        turnNum++;
+        sleep(1);
     }
 
-    cout << "Which square do you want to strike? Enter in coordinates one at a time." << endl;
-    cout << "Select a horizontal coordinate (this will be your x): ";
-    cin >> hori;
-    cout << "Select a vertical coordinate (this will be your y): ";
-    cin >> vert;
-
-    if (vert >= 0 && vert < 10) {
-        vertCheck = true;
-    }
-    if (hori >= 0 && hori < 10) {
-        horiCheck = true;
-    }
-
-    //Checks and Confirmation
-    if (vertCheck && horiCheck) {
-        coor = vert * 10 + hori;
-        attackSuccess = player.attackShips(coor); //the player must adjust their opp hold during here
-    }
-    else {
-        cout << "Coordinates were found incorrect. Turn must be skipped." << endl;
-    }
-
-    //Preparing information to give to player next turn
-    tempOppHold = player.getNewSink(); //Set temp hold for next person
-    lastTurnSucc = player.sendSuccess();
-    lastCoordinate = player.sendLastIndex();
-
-    //Final Verdict
-    if (attackSuccess) {
-        cout << "The attack was successful! You're on the trail." << endl;
-    }
-    else {
-        cout << "The attack was a failure. Try again." << endl;
-    }
-
-    return playerDone;
+    endgame(loser, turnNum);
 }
 
-bool Battleship::computerAction(Computer computer) {
-    bool computerDone = false;
-    bool attackSuccess = false;
-    int coor;
+// Computer vs Computer Turn Management
+void Battleship::gameplay(Computer& computerOne, Computer& computerTwo) {
+    bool gameEnded = false;
+    int loser = 0;
 
-    //Pre-turn tasks
-    computer.setLastIndex(lastCoordinate);
-    computer.setOppSucc(lastTurnSucc);
-    computer.setNewSink(tempOppHold);
-    computerDone = computer.preTurnTasks();
+    // Show boards at start
+    cout << endl << endl << "Game Start!" << endl;
+    computerOne.showOnlyPlayer();
+    computerTwo.showOnlyPlayer();
+    
+    // Loop for entire game
+    while (gameEnded == false) {
+        cout << endl << "Turn " << turnNum + 1 << endl;
+        //Computer 1 attacks, Computer 2 checks
+        if (computerOne.checkShipHealth() == true) {
+            int att = computerOne.sendAttackAuto();
+            bool result = computerTwo.checkAttack(att);
+            computerOne.setSuccess(result);
+            if (result == true) {
+                cout << "Computer 1 has successfully hit square " << result << "!" << endl;
+            }
+            else if (att == -2) { //Ran out of guesses
+                cout << "Computer 1 is out of guesses." << endl;
+                cout << "Computer 1 has lost the game." << endl;
+                gameEnded = true;
+                loser = 2;
+            }
+            else {
+                cout <<  "Computer 1 has missed." << endl;
+            }
+            computerOne.modifyEnemyGrid(computerTwo.passOwnGrid());
+        }
+        else {
+            cout << "Computer 1 has lost the game." << endl;
+            loser = 1;
+            break;
+        }
+        computerOne.showOnlyPlayer();
 
-    cout << "Turn number: " << turnNum << endl;
-    computer.displayTurn();
+        //Computer 2 attacks, Computer 1 checks
+        if (computerTwo.checkShipHealth() == true) {
+            int att = computerTwo.sendAttackAuto();
+            bool result = computerOne.checkAttack(att);
+            computerTwo.setSuccess(result);
+            if (result == true) {
+                cout << "Computer 2 has successfully hit square " << result << "!" << endl;
+            }
+            else if (att == -2) { //Ran out of guesses
+                cout << "Computer 2 is out of guesses." << endl;
+                cout << "Computer 2 has lost the game." << endl;
+                gameEnded = true;
+                loser = 2;
+            }
+            else {
+                cout << "Computer 2 has missed." << endl;
+            }
+            computerTwo.modifyEnemyGrid(computerOne.passOwnGrid());
+        }
+        else {
+            cout << "Computer 2 has lost the game." << endl;
+            loser = 2;
+            break;
+        }
+        computerTwo.showOnlyPlayer();
 
-    if (computerDone) {
-        return computerDone;
+        turnNum++;
+        sleep(1);
     }
 
-    cout << "The Computer will select now." << endl;
-    //Sleep timer here if you want
+    endgame(loser, turnNum);
+}
 
-    coor = computer.chooseCoordinate();
-
-    attackSuccess = computer.attackShips(coor);
-
-    //Preparing information to give to player next turn
-    tempOppHold = computer.getNewSink();
-    lastTurnSucc = computer.sendSuccess();
-    lastCoordinate = computer.sendLastIndex();
-
-    if (attackSuccess) {
-        cout << "The attack was successful! You're on the trail." << endl;
-        //Generate a new potential list of specific targets
-        computer.generateAround(coor);
+// Printing the endgame stats
+void Battleship::endgame(int loser, int turnNum) {
+    if (loser == 2) {
+        cout << "The winner is Player one in " << turnNum << " turns!";
     }
-    else {
-        cout << "The attack was a failure. Try again." << endl;
+    else if (loser == 1) {
+        cout << "The winner is Player two in " << turnNum << " turns!";
     }
-
-    return computerDone;
-}
-
-void Battleship::endGame(Player playerOne, Player playerTwo) {
-
-}
-
-void Battleship::endGame(Player playerOne, Computer computerTwo) {
-
-}
-
-void Battleship::endGame(Computer computerOne, Computer computerTwo) {
-
 }

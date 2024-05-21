@@ -1,31 +1,36 @@
-#include "grid.h"
-
 #ifndef LOCATION_H
 #define LOCATION_H
+
+#include "grid.h"
 
 class Location {
 private:
     Grid Own;
     Grid Enemy;
-    Grid EnemyProgress;
 public:
     //Constructor
     Location();
 
-    //Basic operations
+    //Own Grid Functions
     void printOwnGrid();
-    void printProgressGrid();
-    int* getOwnGrid();
-    void setEnemyGrid(int*);
-    int* getEnemyGrid();
-    int* getProgressGrid();
-    void setEnemyGrid();
+    array<int, 100> getOwnGrid();
+
+    // Enemy Grid Functions
+    void printEnemyGrid();
+    void setEnemyGrid(array<int, 100>);
+    array<int, 100> getEnemyGrid();
+
+    // Clear Utility
     void clearScreen();
 
-    bool checkOwnIndex(int);
+    // Checking emptiness for placement
+    bool checkOwnEmpty(int);
+
+    // Checking attack from enemy
     bool checkEnemyAttack(int);
+
+    // Index Setter functions
     void setOwnIndex(int, int);
-    void setProgressIndex(int, int);
     void setEnemyIndex(int, int);
 };
 

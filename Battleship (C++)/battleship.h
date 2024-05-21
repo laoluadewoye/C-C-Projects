@@ -2,6 +2,7 @@
 #define BATTLESHIP_H
 
 #include <iostream>
+#include <unistd.h>
 #include "player.h"
 #include "computer.h"
 
@@ -10,9 +11,6 @@ using namespace std;
 class Battleship {
 private:
     int turnNum;
-    int* tempOppHold;
-    bool lastTurnSucc;
-    int lastCoordinate;
 public:
     //Beginning constructor and functions
     Battleship();
@@ -22,19 +20,15 @@ public:
     void PVPSetup();
     void PVCSetup();
     void CVCSetup();
-    void manualOrAuto(Player);
+    void manualOrAuto(Player&);
 
     //Gameplay functions
-    void gameplay(Player, Player);
-    void gameplay(Player, Computer);
-    void gameplay(Computer, Computer);
-    bool playerAction(Player);
-    bool computerAction(Computer);
+    void gameplay(Player&, Player&);
+    void gameplay(Player&, Computer&);
+    void gameplay(Computer&, Computer&);
 
-    //Endgame functions
-    void endGame(Player, Player);
-    void endGame(Player, Computer);
-    void endGame(Computer, Computer);
+    //Endgame
+    void endgame(int, int);
 };
 
 #endif // BATTLESHIP_H

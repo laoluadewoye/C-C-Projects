@@ -2,26 +2,25 @@
 #define GRID_H
 
 #include <iostream>
+#include <array>
 
 using namespace std;
 
 class Grid {
-
 private:
-    int* battlefield = new int[100];
-
+    array<int, 100> battlefield;
 public:
     //Constructor functions
     Grid();
     void populateGrid();
 
     //Printing
-    void printGridDisplay();
+    void printGridDisplay(int);
     char numSymbolTrans(int);
 
     //Other basic functions
-    int* getGrid();
-    void setGrid(int*);
+    array<int, 100> getGrid();
+    void setGrid(array<int, 100>);
     int getIndexStatus(int);
     void setIndexStatus(int, int);
 };
